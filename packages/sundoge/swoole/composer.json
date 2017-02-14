@@ -1,0 +1,12 @@
+{
+    "name": "sundoge/swoole",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "SunDoge",
+            "email": "384813529@qq.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
