@@ -12,7 +12,8 @@ Understand how Lumen and Laravel work by imitating the code and finally build my
 - [x] Make `controller` work.
 - [ ] Modify the `Request`.
 - [ ] Modify the `Response`.
-- [ ] Write redis driver and add in `hredis`.
+- [ ] Write `Mysql` driver.
+- [ ] Write `Redis` driver and add in `hredis`.
 
 ***
 Run
