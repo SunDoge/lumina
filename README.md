@@ -2,15 +2,28 @@
 
 Learn Lumen and Laravel.
 
-***
+## Goal
 
-```bash
+Understand how Lumen and Laravel work by imitating the code and finally build my own framework.
+
+## TODO
+
+- [x] Make `router` work.
+- [x] Make `controller` work.
+- [ ] Modify the `Request`.
+- [ ] Modify the `Response`.
+- [ ] Write redis driver and add in `hredis`.
+
+***
+Run
+
+```php
 php public/index.php
 ```
 
 ***
 
-Benchmark(2017/02/16)
+Benchmark(2017/02/16) `return 'Hello world!;`
 
 ```text
 ➜  Sites ab -t 10 -c 100 http://127.0.0.1:8888/

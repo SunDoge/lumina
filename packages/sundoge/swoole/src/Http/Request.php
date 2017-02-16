@@ -12,5 +12,11 @@ namespace SunDoge\Swoole\Http;
 
 class Request
 {
+    protected $request;
 
+
+    public function __construct($request)
+    {
+        $this->request = $request;
+    }
 }
