@@ -14,6 +14,7 @@ use Illuminate\Pipeline\Pipeline;
 use FastRoute\Dispatcher;
 use SunDoge\Swoole\Routing\Closure as RoutingClosure;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 
 trait RoutesRequests
 {

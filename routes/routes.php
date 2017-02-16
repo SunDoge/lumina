@@ -9,3 +9,9 @@
 $app->get('/', function () {
     return 'swoole';
 });
+
+$app->get('/test', function () {
+    return 'test';
+});
+
+$app->get('/controller', 'TestController@index');
