@@ -8,5 +8,13 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "SunDoge\\Swoole\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    }
 }

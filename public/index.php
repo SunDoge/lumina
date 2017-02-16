@@ -6,21 +6,33 @@
  * Time: 下午7:23
  */
 
-require __DIR__.'/../bootstrap/autoload.php';
+require __DIR__.'/../bootstrap/app.php';
 
-$app = new Illuminate\Container\Container();
+//$app['app'] = $app;
+//
+//with(new Illuminate\Events\EventServiceProvider($app))->register();
+//with(new Illuminate\Routing\RoutingServiceProvider($app))->register();
+//
+//$basePath = str_finish(dirname(__FILE__), '/');
+//require $basePath.'../routes/web.php';
+//
 
-Illuminate\Support\Facades\Facade::setFacadeApplication($app);
+//dd($app);
 
-$app['app'] = $app;
+//$request = Illuminate\Http\Request::createFromGlobals();
+//$response = $app['router']->dispatch($request);
+//$response = $app->dispatch($request);
 
-with(new Illuminate\Events\EventServiceProvider($app))->register();
-with(new Illuminate\Routing\RoutingServiceProvider($app))->register();
+//echo (string) $response;
+//$response->send();
+$app->createDispatcher();
+$http = new swoole_http_server("127.0.0.1", 8888);
+$http->on('request', function ($request, $response) use ($app) {
 
-$basePath = str_finish(dirname(__FILE__), '/');
-require $basePath.'../routes/web.php';
+    $app->onRequest($request, $response, function ($response, $data) {
+        $response->end($data);
+    });
 
-$request = Illuminate\Http\Request::createFromGlobals();
-$response = $app['router']->dispatch($request);
-
-$response->send();
+//    $response->end("<h1>Hello Swoole. #".rand(1000, 9999)."</h1>");
+});
+$http->start();

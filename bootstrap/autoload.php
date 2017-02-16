@@ -6,4 +6,4 @@
  * Time: 下午7:24
  */
 
-require __DIR__.'/../vendor/autoload.php';
+//require __DIR__.'/../vendor/autoload.php';
