@@ -384,7 +384,8 @@ trait RoutesRequests
         }
         $response->status($res->getStatusCode());
 //        dd($res);
-        return call_user_func_array($callback, [$response, $content]);
+//        return call_user_func_array($callback, [$response, $content]);
+        $response->end($content);
     }
 
     /**
