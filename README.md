@@ -19,7 +19,7 @@ Understand how Lumen and Laravel work by imitating the code and finally build my
 Run
 
 ```php
-php public/index.php
+php bootstrap/http.php
 ```
 
 ***
