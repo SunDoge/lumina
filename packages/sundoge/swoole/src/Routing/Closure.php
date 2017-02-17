@@ -10,5 +10,5 @@ namespace SunDoge\Swoole\Routing;
 
 class Closure
 {
-//    use ProvidesConvenienceMethods;
+    use ProvidesConvenienceMethods;
 }

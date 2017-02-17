@@ -15,6 +15,8 @@ use FastRoute\Dispatcher;
 use SunDoge\Swoole\Routing\Closure as RoutingClosure;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 trait RoutesRequests
 {
@@ -71,8 +73,8 @@ trait RoutesRequests
     /**
      * Register a set of routes with a set of shared attributes.
      *
-     * @param  array  $attributes
-     * @param  \Closure  $callback
+     * @param  array $attributes
+     * @param  \Closure $callback
      * @return void
      */
     public function group(array $attributes, Closure $callback)
@@ -93,8 +95,8 @@ trait RoutesRequests
     /**
      * Register a route with the application.
      *
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param  string $uri
+     * @param  mixed $action
      * @return $this
      */
     public function get($uri, $action)
@@ -107,8 +109,8 @@ trait RoutesRequests
     /**
      * Register a route with the application.
      *
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param  string $uri
+     * @param  mixed $action
      * @return $this
      */
     public function post($uri, $action)
@@ -121,8 +123,8 @@ trait RoutesRequests
     /**
      * Register a route with the application.
      *
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param  string $uri
+     * @param  mixed $action
      * @return $this
      */
     public function put($uri, $action)
@@ -135,8 +137,8 @@ trait RoutesRequests
     /**
      * Register a route with the application.
      *
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param  string $uri
+     * @param  mixed $action
      * @return $this
      */
     public function patch($uri, $action)
@@ -149,8 +151,8 @@ trait RoutesRequests
     /**
      * Register a route with the application.
      *
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param  string $uri
+     * @param  mixed $action
      * @return $this
      */
     public function delete($uri, $action)
@@ -163,8 +165,8 @@ trait RoutesRequests
     /**
      * Register a route with the application.
      *
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param  string $uri
+     * @param  mixed $action
      * @return $this
      */
     public function options($uri, $action)
@@ -175,11 +177,24 @@ trait RoutesRequests
     }
 
     /**
+     * Register a route for static files. Haven't decided yet.
+     *
+     * @param string $uri
+     * @param mixed $action
+     */
+    public function asset($uri, $action)
+    {
+        $this->group(['middleware' => 'static'], function () {
+//            $this->get('/', )
+        });
+    }
+
+    /**
      * Add a route to the collection.
      *
-     * @param  array|string  $method
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param  array|string $method
+     * @param  string $uri
+     * @param  mixed $action
      * @return void
      */
     public function addRoute($method, $uri, $action)
@@ -188,17 +203,17 @@ trait RoutesRequests
 
         if (isset($this->groupAttributes)) {
             if (isset($this->groupAttributes['prefix'])) {
-                $uri = trim($this->groupAttributes['prefix'], '/').'/'.trim($uri, '/');
+                $uri = trim($this->groupAttributes['prefix'], '/') . '/' . trim($uri, '/');
             }
 
             if (isset($this->groupAttributes['suffix'])) {
-                $uri = trim($uri, '/').rtrim($this->groupAttributes['suffix'], '/');
+                $uri = trim($uri, '/') . rtrim($this->groupAttributes['suffix'], '/');
             }
 
             $action = $this->mergeGroupAttributes($action);
         }
 
-        $uri = '/'.trim($uri, '/');
+        $uri = '/' . trim($uri, '/');
 
         if (isset($action['as'])) {
             $this->namedRoutes[$action['as']] = $uri;
@@ -206,24 +221,24 @@ trait RoutesRequests
 
         if (is_array($method)) {
             foreach ($method as $verb) {
-                $this->routes[$verb.$uri] = ['method' => $verb, 'uri' => $uri, 'action' => $action];
+                $this->routes[$verb . $uri] = ['method' => $verb, 'uri' => $uri, 'action' => $action];
             }
         } else {
-            $this->routes[$method.$uri] = ['method' => $method, 'uri' => $uri, 'action' => $action];
+            $this->routes[$method . $uri] = ['method' => $method, 'uri' => $uri, 'action' => $action];
         }
     }
 
     /**
      * Parse the action into an array format.
      *
-     * @param  mixed  $action
+     * @param  mixed $action
      * @return array
      */
     protected function parseAction($action)
     {
         if (is_string($action)) {
             return ['uses' => $action];
-        } elseif (! is_array($action)) {
+        } elseif (!is_array($action)) {
             return [$action];
         }
 
@@ -237,7 +252,7 @@ trait RoutesRequests
     /**
      * Merge the group attributes into the action.
      *
-     * @param  array  $action
+     * @param  array $action
      * @return array
      */
     protected function mergeGroupAttributes(array $action)
@@ -250,13 +265,13 @@ trait RoutesRequests
     /**
      * Merge the namespace group into the action.
      *
-     * @param  array  $action
+     * @param  array $action
      * @return array
      */
     protected function mergeNamespaceGroup(array $action)
     {
         if (isset($this->groupAttributes['namespace']) && isset($action['uses'])) {
-            $action['uses'] = $this->groupAttributes['namespace'].'\\'.$action['uses'];
+            $action['uses'] = $this->groupAttributes['namespace'] . '\\' . $action['uses'];
         }
 
         return $action;
@@ -265,7 +280,7 @@ trait RoutesRequests
     /**
      * Merge the middleware group into the action.
      *
-     * @param  array  $action
+     * @param  array $action
      * @return array
      */
     protected function mergeMiddlewareGroup($action)
@@ -284,12 +299,12 @@ trait RoutesRequests
     /**
      * Add new middleware to the application.
      *
-     * @param  Closure|array  $middleware
+     * @param  Closure|array $middleware
      * @return $this
      */
     public function middleware($middleware)
     {
-        if (! is_array($middleware)) {
+        if (!is_array($middleware)) {
             $middleware = [$middleware];
         }
 
@@ -301,7 +316,7 @@ trait RoutesRequests
     /**
      * Define the route middleware for the application.
      *
-     * @param  array  $middleware
+     * @param  array $middleware
      * @return $this
      */
     public function routeMiddleware(array $middleware)
@@ -328,17 +343,19 @@ trait RoutesRequests
     /**
      * Run the application and send the response.
      *
-     * @param  SymfonyRequest|null  $request
+     * @param  SymfonyRequest|null $request
      * @return void
      */
     public function run($request = null)
     {
         $response = $this->dispatch($request);
-
+//        dd($response);
+//        dd(array_keys($response->headers->all())[0]);
         if ($response instanceof SymfonyResponse) {
             $response->send();
         } else {
-            echo (string) $response;
+            echo (string)$response;
+//            print_r($response);
         }
 
         if (count($this->middleware) > 0) {
@@ -346,7 +363,7 @@ trait RoutesRequests
         }
     }
 
-    public function onRequest($request,$response, $callback = null)
+    public function onRequest($request, $response, $callback = null)
     {
         $uri = $request->server['request_uri'];
         $method = $request->server['request_method'];
@@ -356,19 +373,24 @@ trait RoutesRequests
         }
         $uri = rawurldecode($uri);
 
-        $res =   $this->handleDispatcherResponse(
+        $res = $this->handleDispatcherResponse(
             $this->createDispatcher()->dispatch($method, $uri)
         );
 
-        $data = $res->getContent();
+        $content = $res->getContent();
+        $headers = $res->headers->all();
+        foreach ($headers as $key => $value) {
+            $response->header($key, $value[0]);
+        }
+        $response->status($res->getStatusCode());
 //        dd($res);
-        return call_user_func_array($callback, [$response, $data]);
+        return call_user_func_array($callback, [$response, $content]);
     }
 
     /**
      * Call the terminable middleware.
      *
-     * @param  mixed  $response
+     * @param  mixed $response
      * @return void
      */
     protected function callTerminableMiddleware($response)
@@ -380,7 +402,7 @@ trait RoutesRequests
         $response = $this->prepareResponse($response);
 
         foreach ($this->middleware as $middleware) {
-            if (! is_string($middleware)) {
+            if (!is_string($middleware)) {
                 continue;
             }
 
@@ -395,7 +417,7 @@ trait RoutesRequests
     /**
      * Dispatch the incoming request.
      *
-     * @param  SymfonyRequest|null  $request
+     * @param  SymfonyRequest|null $request
      * @return Response
      */
     public function dispatch($request = null)
@@ -404,10 +426,11 @@ trait RoutesRequests
 
         try {
             return $this->sendThroughPipeline($this->middleware, function () use ($method, $pathInfo) {
-                if (isset($this->routes[$method.$pathInfo])) {
-                    return $this->handleFoundRoute([true, $this->routes[$method.$pathInfo]['action'], []]);
+                if (isset($this->routes[$method . $pathInfo])) {
+//                    print_r($this->routes);
+                    return $this->handleFoundRoute([true, $this->routes[$method . $pathInfo]['action'], []]);
                 }
-
+//                print_r($this->routes);
                 return $this->handleDispatcherResponse(
                     $this->createDispatcher()->dispatch($method, $pathInfo)
                 );
@@ -422,7 +445,7 @@ trait RoutesRequests
     /**
      * Parse the incoming request and return the method and path info.
      *
-     * @param  \Illuminate\Http\Request|null  $request
+     * @param  \Illuminate\Http\Request|null $request
      * @return array
      */
     protected function parseIncomingRequest($request)
@@ -454,7 +477,7 @@ trait RoutesRequests
     /**
      * Set the FastRoute dispatcher instance.
      *
-     * @param  \FastRoute\Dispatcher  $dispatcher
+     * @param  \FastRoute\Dispatcher $dispatcher
      * @return void
      */
     public function setDispatcher(Dispatcher $dispatcher)
@@ -465,7 +488,7 @@ trait RoutesRequests
     /**
      * Handle the response from the FastRoute dispatcher.
      *
-     * @param  array  $routeInfo
+     * @param  array $routeInfo
      * @return mixed
      */
     protected function handleDispatcherResponse($routeInfo)
@@ -485,7 +508,7 @@ trait RoutesRequests
     /**
      * Handle a route found by the dispatcher.
      *
-     * @param  array  $routeInfo
+     * @param  array $routeInfo
      * @return mixed
      */
     protected function handleFoundRoute($routeInfo)
@@ -506,7 +529,7 @@ trait RoutesRequests
                 return $this->callActionOnArrayBasedRoute($this['request']->route());
             }));
         }
-
+//        dd($action);
         return $this->prepareResponse(
             $this->callActionOnArrayBasedRoute($routeInfo)
         );
@@ -515,13 +538,13 @@ trait RoutesRequests
     /**
      * Call the Closure on the array based route.
      *
-     * @param  array  $routeInfo
+     * @param  array $routeInfo
      * @return mixed
      */
     protected function callActionOnArrayBasedRoute($routeInfo)
     {
         $action = $routeInfo[1];
-
+//        dd($action);
         if (isset($action['uses'])) {
             return $this->prepareResponse($this->callControllerAction($routeInfo));
         }
@@ -543,20 +566,20 @@ trait RoutesRequests
     /**
      * Call a controller based route.
      *
-     * @param  array  $routeInfo
+     * @param  array $routeInfo
      * @return mixed
      */
     protected function callControllerAction($routeInfo)
     {
         $uses = $routeInfo[1]['uses'];
 
-        if (is_string($uses) && ! Str::contains($uses, '@')) {
+        if (is_string($uses) && !Str::contains($uses, '@')) {
             $uses .= '@__invoke';
         }
 
         list($controller, $method) = explode('@', $uses);
 
-        if (! method_exists($instance = $this->make($controller), $method)) {
+        if (!method_exists($instance = $this->make($controller), $method)) {
             throw new NotFoundHttpException;
         }
 
@@ -572,9 +595,9 @@ trait RoutesRequests
     /**
      * Send the request through a Lumen controller.
      *
-     * @param  mixed  $instance
-     * @param  string  $method
-     * @param  array  $routeInfo
+     * @param  mixed $instance
+     * @param  string $method
+     * @param  array $routeInfo
      * @return mixed
      */
     protected function callLumenController($instance, $method, $routeInfo)
@@ -595,10 +618,10 @@ trait RoutesRequests
     /**
      * Send the request through a set of controller middleware.
      *
-     * @param  mixed  $instance
-     * @param  string  $method
-     * @param  array  $routeInfo
-     * @param  array  $middleware
+     * @param  mixed $instance
+     * @param  string $method
+     * @param  array $routeInfo
+     * @param  array $middleware
      * @return mixed
      */
     protected function callLumenControllerWithMiddleware($instance, $method, $routeInfo, $middleware)
@@ -613,8 +636,8 @@ trait RoutesRequests
     /**
      * Call a controller callable and return the response.
      *
-     * @param  callable  $callable
-     * @param  array  $parameters
+     * @param  callable $callable
+     * @param  array $parameters
      * @return \Illuminate\Http\Response
      */
     protected function callControllerCallable(callable $callable, array $parameters = [])
@@ -631,30 +654,30 @@ trait RoutesRequests
     /**
      * Gather the full class names for the middleware short-cut string.
      *
-     * @param  string  $middleware
+     * @param  string $middleware
      * @return array
      */
     protected function gatherMiddlewareClassNames($middleware)
     {
-        $middleware = is_string($middleware) ? explode('|', $middleware) : (array) $middleware;
+        $middleware = is_string($middleware) ? explode('|', $middleware) : (array)$middleware;
 
         return array_map(function ($name) {
             list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
 
-            return array_get($this->routeMiddleware, $name, $name).($parameters ? ':'.$parameters : '');
+            return array_get($this->routeMiddleware, $name, $name) . ($parameters ? ':' . $parameters : '');
         }, $middleware);
     }
 
     /**
      * Send the request through the pipeline with the given callback.
      *
-     * @param  array  $middleware
-     * @param  \Closure  $then
+     * @param  array $middleware
+     * @param  \Closure $then
      * @return mixed
      */
     protected function sendThroughPipeline(array $middleware, Closure $then)
     {
-        if (count($middleware) > 0 && ! $this->shouldSkipMiddleware()) {
+        if (count($middleware) > 0 && !$this->shouldSkipMiddleware()) {
             return (new Pipeline($this))
                 ->send($this->make('request'))
                 ->through($middleware)
@@ -667,19 +690,21 @@ trait RoutesRequests
     /**
      * Prepare the response for sending.
      *
-     * @param  mixed  $response
+     * @param  mixed $response
      * @return Response
      */
     public function prepareResponse($response)
     {
         if ($response instanceof PsrResponseInterface) {
+//            dd('psr');
             $response = (new HttpFoundationFactory)->createResponse($response);
-        } elseif (! $response instanceof SymfonyResponse) {
+        } elseif (!$response instanceof SymfonyResponse) {
+//            dd('symfony');
             $response = new Response($response);
         } elseif ($response instanceof BinaryFileResponse) {
             $response = $response->prepare(Request::capture());
         }
-
+//        dd($response->getContent());
         return $response;
     }
 
@@ -706,7 +731,7 @@ trait RoutesRequests
     {
         $query = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
 
-        return '/'.trim(str_replace('?'.$query, '', $_SERVER['REQUEST_URI']), '/');
+        return '/' . trim(str_replace('?' . $query, '', $_SERVER['REQUEST_URI']), '/');
     }
 
     /**
