@@ -8,14 +8,16 @@
 
 namespace SunDoge\Swoole;
 
+use Monolog\Logger;
 use Illuminate\Container\Container;
-use Illuminate\Http\Request;
-use SunDoge\Swoole\Concerns\RegistersExceptionHandlers;
-use SunDoge\Swoole\Concerns\RoutesRequests;
+//use Illuminate\Http\Request;
+use SunDoge\Swoole\Http\Request;
+
 
 class Application extends Container
 {
-    use RoutesRequests, RegistersExceptionHandlers;
+    use Concerns\RoutesRequests,
+        Concerns\RegistersExceptionHandlers;
 
     protected $basePath;
 
@@ -49,16 +51,17 @@ class Application extends Container
         return $this->basePath . DIRECTORY_SEPARATOR . 'app';
     }
 
-    protected function prepareRequest(Request $request)
-    {
-        $request->setUserResolver(function () {
-            return $this->make('auth')->user();
-        })->setRouteResolver(function () {
-            return $this->currentRoute;
-        });
+//    protected function prepareRequest(Request $request)
+//    {
+//        $request->setUserResolver(function () {
+//            return $this->make('auth')->user();
+//        })->setRouteResolver(function () {
+//            return $this->currentRoute;
+//        });
+//
+//        return $request;
+//    }
 
-        return $request;
-    }
 
     protected function registerContainerAliases()
     {
@@ -79,8 +82,9 @@ class Application extends Container
             'log' => 'Psr\Log\LoggerInterface',
             'Illuminate\Contracts\Queue\Factory' => 'queue',
             'Illuminate\Contracts\Queue\Queue' => 'queue.connection',
-            'request' => 'Illuminate\Http\Request',
-            'Laravel\Lumen\Routing\UrlGenerator' => 'url',
+//            'request' => 'Illuminate\Http\Request',
+            'request' => 'SunDoge\Swoole\Http\Request',
+//            'Laravel\Lumen\Routing\UrlGenerator' => 'url',
             'Illuminate\Contracts\Validation\Factory' => 'validator',
             'Illuminate\Contracts\View\Factory' => 'view',
         ];

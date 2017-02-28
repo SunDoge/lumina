@@ -10,9 +10,12 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "illuminate/routing": "^5.4",
         "illuminate/events": "^5.4",
-        "nikic/fast-route": "^1.0"
+        "nikic/fast-route": "^1.0",
+        "ircmaxell/tari-php": "dev-master",
+        "monolog/monolog": "^1.22",
+        "zendframework/zend-diactoros": "^1.3",
+        "symfony/Debug": "^3.2"
     },
     "autoload": {
         "classmap": [

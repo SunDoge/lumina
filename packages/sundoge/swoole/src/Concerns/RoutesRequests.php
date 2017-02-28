@@ -9,14 +9,17 @@
 namespace SunDoge\Swoole\Concerns;
 
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Pipeline\Pipeline;
+//use Illuminate\Http\Request;
+use SunDoge\Swoole\Http\Request;
+//use Illuminate\Pipeline\Pipeline;
 use FastRoute\Dispatcher;
 use SunDoge\Swoole\Routing\Closure as RoutingClosure;
-use Illuminate\Http\Response;
+//use Illuminate\Http\Response;
+use SunDoge\Swoole\Http\Response;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+//use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+//use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Psr\Http\Message\ResponseInterface as PsrResponse;
 
 trait RoutesRequests
 {
@@ -329,16 +332,16 @@ trait RoutesRequests
     /**
      * {@inheritdoc}
      */
-    public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
-    {
-        $response = $this->dispatch($request);
-
-        if (count($this->middleware) > 0) {
-            $this->callTerminableMiddleware($response);
-        }
-
-        return $response;
-    }
+//    public function handle(SymfonyRequest $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+//    {
+//        $response = $this->dispatch($request);
+//
+//        if (count($this->middleware) > 0) {
+//            $this->callTerminableMiddleware($response);
+//        }
+//
+//        return $response;
+//    }
 
     /**
      * Run the application and send the response.
@@ -351,8 +354,10 @@ trait RoutesRequests
         $response = $this->dispatch($request);
 //        dd($response);
 //        dd(array_keys($response->headers->all())[0]);
-        if ($response instanceof SymfonyResponse) {
-            $response->send();
+//        if ($response instanceof SymfonyResponse) {
+//            $response->send();
+        if ($response instanceof PsrResponse) {
+            return $response;
         } else {
             echo (string)$response;
 //            print_r($response);
@@ -446,7 +451,7 @@ trait RoutesRequests
     /**
      * Parse the incoming request and return the method and path info.
      *
-     * @param  \Illuminate\Http\Request|null $request
+     * @param  $request
      * @return array
      */
     protected function parseIncomingRequest($request)
@@ -639,7 +644,7 @@ trait RoutesRequests
      *
      * @param  callable $callable
      * @param  array $parameters
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     protected function callControllerCallable(callable $callable, array $parameters = [])
     {
@@ -694,18 +699,35 @@ trait RoutesRequests
      * @param  mixed $response
      * @return Response
      */
+//    public function prepareResponse($response)
+//    {
+//        if ($response instanceof PsrResponseInterface) {
+////            dd('psr');
+//            $response = (new HttpFoundationFactory)->createResponse($response);
+//        } elseif (!$response instanceof SymfonyResponse) {
+////            dd('symfony');
+//            $response = new Response($response);
+//        } elseif ($response instanceof BinaryFileResponse) {
+//            $response = $response->prepare(Request::capture());
+//        }
+////        dd($response->getContent());
+//        return $response;
+//    }
+
     public function prepareResponse($response)
     {
-        if ($response instanceof PsrResponseInterface) {
+        if ($response instanceof PsrResponse) {
 //            dd('psr');
             $response = (new HttpFoundationFactory)->createResponse($response);
-        } elseif (!$response instanceof SymfonyResponse) {
+//            dd('psr');
+
+//        } elseif (!$response instanceof SymfonyResponse) {
 //            dd('symfony');
-            $response = new Response($response);
+//            $response = new Response($response);
         } elseif ($response instanceof BinaryFileResponse) {
             $response = $response->prepare(Request::capture());
         }
-//        dd($response->getContent());
+//        dd($response);
         return $response;
     }
 

@@ -38,9 +38,9 @@ class Handler implements ExceptionHandler
         }
 
         try {
-            $logger = app('Psr\Log\LoggerInterface');
+//            $logger = app('Psr\Log\LoggerInterface');
             // Composer fails to include helpers.php for no reason.
-            // $logger = Container::getInstance()->make('Psr\Log\LoggerInterface');
+             $logger = Container::getInstance()->make('Psr\Log\LoggerInterface');
         } catch (Exception $ex) {
             throw $e; // throw the original exception
         }
