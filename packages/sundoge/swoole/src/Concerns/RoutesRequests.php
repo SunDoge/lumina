@@ -13,6 +13,7 @@ use Closure;
 use SunDoge\Swoole\Http\Request;
 //use Illuminate\Pipeline\Pipeline;
 use FastRoute\Dispatcher;
+use SunDoge\Swoole\Http\SapiEmitter;
 use SunDoge\Swoole\Routing\Closure as RoutingClosure;
 //use Illuminate\Http\Response;
 use SunDoge\Swoole\Http\Response;
@@ -357,7 +358,9 @@ trait RoutesRequests
 //        if ($response instanceof SymfonyResponse) {
 //            $response->send();
         if ($response instanceof PsrResponse) {
-            return $response;
+//            $emmiter = new SapiEmitter();
+//            $emmiter->emit($response);
+            (new SapiEmitter())->emit($response);
         } else {
             echo (string)$response;
 //            print_r($response);
@@ -454,6 +457,18 @@ trait RoutesRequests
      * @param  $request
      * @return array
      */
+//    protected function parseIncomingRequest($request)
+//    {
+//        if ($request) {
+//            $this->instance(Request::class, $this->prepareRequest($request));
+//            $this->ranServiceBinders['registerRequestBindings'] = true;
+//
+//            return [$request->getMethod(), $request->getPathInfo()];
+//        } else {
+//            return [$this->getMethod(), $this->getPathInfo()];
+//        }
+//    }
+
     protected function parseIncomingRequest($request)
     {
         if ($request) {
@@ -718,7 +733,8 @@ trait RoutesRequests
     {
         if ($response instanceof PsrResponse) {
 //            dd('psr');
-            $response = (new HttpFoundationFactory)->createResponse($response);
+//            $response = (new HttpFoundationFactory)->createResponse($response);
+
 //            dd('psr');
 
 //        } elseif (!$response instanceof SymfonyResponse) {
@@ -727,7 +743,7 @@ trait RoutesRequests
         } elseif ($response instanceof BinaryFileResponse) {
             $response = $response->prepare(Request::capture());
         }
-//        dd($response);
+
         return $response;
     }
 

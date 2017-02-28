@@ -51,16 +51,16 @@ class Application extends Container
         return $this->basePath . DIRECTORY_SEPARATOR . 'app';
     }
 
-//    protected function prepareRequest(Request $request)
-//    {
-//        $request->setUserResolver(function () {
-//            return $this->make('auth')->user();
-//        })->setRouteResolver(function () {
-//            return $this->currentRoute;
-//        });
-//
-//        return $request;
-//    }
+    protected function prepareRequest(Request $request)
+    {
+        $request->setUserResolver(function () {
+            return $this->make('auth')->user();
+        })->setRouteResolver(function () {
+            return $this->currentRoute;
+        });
+
+        return $request;
+    }
 
 
     protected function registerContainerAliases()

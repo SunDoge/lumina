@@ -44,4 +44,17 @@ class Request extends ZendRequest
             return $route->parameter($param);
         }
     }
+
+    /**
+     * Set the user resolver callback.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function setUserResolver(Closure $callback)
+    {
+        $this->userResolver = $callback;
+
+        return $this;
+    }
 }

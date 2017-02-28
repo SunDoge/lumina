@@ -24,6 +24,9 @@
         "psr-4": {
             "App\\": "app/",
             "SunDoge\\Swoole\\": "packages/sundoge/swoole/src"
-        }
+        },
+        "files": [
+            "packages/sundoge/swoole/src/helpers.php"
+        ]
     }
 }

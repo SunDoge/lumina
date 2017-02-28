@@ -13,6 +13,6 @@ class TestController
 {
     public function index()
     {
-        return 'controller';
+        return response()->json(['status' => 0]);
     }
 }
