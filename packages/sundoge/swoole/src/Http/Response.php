@@ -9,9 +9,10 @@
 
 namespace SunDoge\Swoole\Http;
 
+use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response as ZendResponse;
 
-class Response extends ZendResponse
+class Response extends ZendResponse implements ResponseInterface
 {
     protected $response;
 

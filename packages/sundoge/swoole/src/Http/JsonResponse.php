@@ -8,10 +8,11 @@
 
 namespace SunDoge\Swoole\Http;
 
+use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response\JsonResponse as BaseResponse;
 
 
-class JsonResponse extends BaseResponse
+class JsonResponse extends BaseResponse implements ResponseInterface
 {
 
 }

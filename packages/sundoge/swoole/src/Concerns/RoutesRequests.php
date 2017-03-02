@@ -10,17 +10,22 @@ namespace SunDoge\Swoole\Concerns;
 
 use Closure;
 //use Illuminate\Http\Request;
+use Psr\Http\Message\ResponseInterface;
 use SunDoge\Swoole\Http\Request;
 //use Illuminate\Pipeline\Pipeline;
 use FastRoute\Dispatcher;
-use SunDoge\Swoole\Http\SapiEmitter;
+
 use SunDoge\Swoole\Routing\Closure as RoutingClosure;
 //use Illuminate\Http\Response;
 use SunDoge\Swoole\Http\Response;
 use Illuminate\Support\Str;
+
 //use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 //use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Psr\Http\Message\ResponseInterface as PsrResponse;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
+use SunDoge\Swoole\Http\RequestFactory;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 trait RoutesRequests
 {
@@ -353,14 +358,13 @@ trait RoutesRequests
     public function run($request = null)
     {
         $response = $this->dispatch($request);
-//        dd($response);
-//        dd(array_keys($response->headers->all())[0]);
+
 //        if ($response instanceof SymfonyResponse) {
 //            $response->send();
-        if ($response instanceof PsrResponse) {
+        if ($response instanceof PsrResponseInterface) {
 //            $emmiter = new SapiEmitter();
 //            $emmiter->emit($response);
-            (new SapiEmitter())->emit($response);
+            (new \SunDoge\Swoole\Http\SapiEmitter())->emit($response);
         } else {
             echo (string)$response;
 //            print_r($response);
@@ -371,29 +375,62 @@ trait RoutesRequests
         }
     }
 
-    public function onRequest($request, $response, $callback = null)
+    public function onRequest($request, $response)
     {
-        $uri = $request->server['request_uri'];
-        $method = $request->server['request_method'];
+//        $uri = $request->server['request_uri'];
+//        $method = $request->server['request_method'];
 
-        if (false !== $pos = strpos($uri, '?')) {
-            $uri = substr($uri, 0, $pos);
+
+//        if (false !== $pos = strpos($uri, '?')) {
+//            $uri = substr($uri, 0, $pos);
+//        }
+//        $uri = rawurldecode($uri);
+//
+//        $res = $this->handleDispatcherResponse(
+//            $this->createDispatcher()->dispatch($method, $uri)
+//        );
+        $psrResponse = $this->_dispatch($request);
+
+
+//        $content = $res->getContent();
+//        $headers = $res->headers->all();
+//        foreach ($headers as $key => $value) {
+//            $response->header($key, $value[0]);
+//        }
+//        $response->status($res->getStatusCode());
+////        dd($res);
+////        return call_user_func_array($callback, [$response, $content]);
+//        $response->end($content);
+        (new \SunDoge\Swoole\Http\SapiEmitter())->emitThrough($psrResponse, $response);
+
+        if (count($this->middleware) > 0) {
+            $this->callTerminableMiddleware($response);
         }
-        $uri = rawurldecode($uri);
+    }
 
-        $res = $this->handleDispatcherResponse(
-            $this->createDispatcher()->dispatch($method, $uri)
-        );
+    public function _dispatch($request)
+    {
+//        $uri = $request->  ;
+//        $method = $request->server['request_method'];
 
-        $content = $res->getContent();
-        $headers = $res->headers->all();
-        foreach ($headers as $key => $value) {
-            $response->header($key, $value[0]);
+        list($method, $pathInfo) = $this->_parseIncomingRequest($request);
+
+        try {
+            return $this->sendThroughPipeline($this->middleware, function () use ($method, $pathInfo) {
+                if (isset($this->routes[$method . $pathInfo])) {
+//                    print_r($this->routes);
+                    return $this->handleFoundRoute([true, $this->routes[$method . $pathInfo]['action'], []]);
+                }
+//                print_r($this->routes);
+                return $this->handleDispatcherResponse(
+                    $this->createDispatcher()->dispatch($method, $pathInfo)
+                );
+            });
+        } catch (Exception $e) {
+            return $this->prepareResponse($this->sendExceptionToHandler($e));
+        } catch (Throwable $e) {
+            return $this->prepareResponse($this->sendExceptionToHandler($e));
         }
-        $response->status($res->getStatusCode());
-//        dd($res);
-//        return call_user_func_array($callback, [$response, $content]);
-        $response->end($content);
     }
 
     /**
@@ -445,9 +482,9 @@ trait RoutesRequests
                 );
             });
         } catch (Exception $e) {
-            return $this->sendExceptionToHandler($e);
+            return $this->prepareResponse($this->sendExceptionToHandler($e));
         } catch (Throwable $e) {
-            return $this->sendExceptionToHandler($e);
+            return $this->prepareResponse($this->sendExceptionToHandler($e));
         }
     }
 
@@ -479,6 +516,17 @@ trait RoutesRequests
         } else {
             return [$this->getMethod(), $this->getPathInfo()];
         }
+    }
+
+    protected function _parseIncomingRequest($request)
+    {
+//        if ($request) {
+        $this->instance(Request::class, RequestFactory::from($request));
+
+        return [$this->_getMethod($request), $this->_getPathInfo($request)];
+//        } else {
+//            return [$this->getMethod(), $this->getQueryParams()];
+//        }
     }
 
     /**
@@ -516,10 +564,14 @@ trait RoutesRequests
     {
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
-                throw new NotFoundHttpException;
+//                throw new NotFoundHttpException;
+                echo 'not found';
+                break;
 
             case Dispatcher::METHOD_NOT_ALLOWED:
-                throw new MethodNotAllowedHttpException($routeInfo[1]);
+//                throw new MethodNotAllowedHttpException($routeInfo[1]);
+                print_r($routeInfo[1]);
+                break;
 
             case Dispatcher::FOUND:
                 return $this->handleFoundRoute($routeInfo);
@@ -731,11 +783,12 @@ trait RoutesRequests
 
     public function prepareResponse($response)
     {
-        if ($response instanceof PsrResponse) {
+        if ($response instanceof PsrResponseInterface) {
 //            dd('psr');
 //            $response = (new HttpFoundationFactory)->createResponse($response);
 
 //            dd('psr');
+//            return $response;
 
 //        } elseif (!$response instanceof SymfonyResponse) {
 //            dd('symfony');
@@ -761,6 +814,15 @@ trait RoutesRequests
         }
     }
 
+    protected function _getMethod($request)
+    {
+        if (isset($request->post['_method'])) {
+            return strtoupper($request->post['_method']);
+        } else {
+            return $request->server['request_method'];
+        }
+    }
+
     /**
      * Get the current HTTP path info.
      *
@@ -772,6 +834,14 @@ trait RoutesRequests
 
         return '/' . trim(str_replace('?' . $query, '', $_SERVER['REQUEST_URI']), '/');
     }
+
+    protected function _getPathInfo($request)
+    {
+        $query = isset($request->server['query_string']) ? $request->server['query_string'] : '';
+
+        return '/' . trim(str_replace('?' . $query, '', $request->server['request_uri']), '/');
+    }
+
 
     /**
      * Get the raw routes for the application.

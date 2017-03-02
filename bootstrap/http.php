@@ -14,6 +14,9 @@ $http = new swoole_http_server("127.0.0.1", 8888);
 
 $action = function ($request, $response) use ($app) {
 
+    if ($request->server['path_info'] == '/favicon.ico' || $request->server['request_uri'] == '/favicon.ico') {
+        return $response->end();
+    }
 //    $app->onRequest($request, $response, function ($response, $data) {
 //        $response->end($data);
 //    });

@@ -10,9 +10,10 @@
 namespace SunDoge\Swoole\Http;
 
 use Closure;
+use Psr\Http\Message\RequestInterface;
 use Zend\Diactoros\ServerRequest as ZendRequest;
 
-class Request extends ZendRequest
+class Request extends ZendRequest implements RequestInterface
 {
     /**
      * Set the route resolver callback.
@@ -57,4 +58,11 @@ class Request extends ZendRequest
 
         return $this;
     }
+
+//    public function getPathInfo()
+//    {
+//        $query = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
+//
+//        return '/'.trim(str_replace('?'.$query, '', $_SERVER['REQUEST_URI']), '/');
+//    }
 }
