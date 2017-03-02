@@ -3,13 +3,14 @@
 namespace SunDoge\Swoole\Exceptions;
 
 use Exception;
-use Illuminate\Container\Container;
 //use Illuminate\Http\Response;
+use SunDoge\Swoole\Http\HtmlResponse;
 use SunDoge\Swoole\Http\Response;
 //use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 //use Illuminate\Auth\Access\AuthorizationException;
 //use Illuminate\Http\Exception\HttpResponseException;
+
 use Symfony\Component\Debug\Exception\FlattenException;
 //use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -80,9 +81,9 @@ class Handler implements ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  $request
      * @param  \Exception  $e
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function render($request, Exception $e)
     {
@@ -98,11 +99,13 @@ class Handler implements ExceptionHandler
 
         $fe = FlattenException::create($e);
 
-        $handler = new SymfonyExceptionHandler(env('APP_DEBUG', false));
+//        $handler = new SymfonyExceptionHandler(env('APP_DEBUG', false));
+        $handler = new SymfonyExceptionHandler(true);
 
         $decorated = $this->decorate($handler->getContent($fe), $handler->getStylesheet($fe));
 
-        $response = new Response($decorated, $fe->getStatusCode(), $fe->getHeaders());
+//        $response = new Response($decorated, $fe->getStatusCode(), $fe->getHeaders());
+        $response = new HtmlResponse($decorated, $fe->getStatusCode(), $fe->getHeaders());
 
         $response->exception = $e;
 

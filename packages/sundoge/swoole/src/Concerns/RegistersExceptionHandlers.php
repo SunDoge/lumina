@@ -6,6 +6,7 @@ use Error;
 use Exception;
 use ErrorException;
 //use Symfony\Component\Console\Output\ConsoleOutput;
+use SunDoge\Swoole\Http\SapiEmitter;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -120,13 +121,14 @@ trait RegistersExceptionHandlers
             $e = new FatalThrowableError($e);
         }
 
-        $handler->report($e);
+//        $handler->report($e);
 
-        if ($this->runningInConsole()) {
-            $handler->renderForConsole(new ConsoleOutput, $e);
-        } else {
-            $handler->render($this->make('request'), $e)->send();
-        }
+//        if ($this->runningInConsole()) {
+//            $handler->renderForConsole(new ConsoleOutput, $e);
+//        } else {
+            $response = $handler->render($this->make('request'), $e);
+//        }
+        (new SapiEmitter())->emit($response);
     }
 
     /**

@@ -9,23 +9,25 @@
 namespace SunDoge\Swoole\Concerns;
 
 use Closure;
-//use Illuminate\Http\Request;
-use Psr\Http\Message\ResponseInterface;
+use Exception;
+use Throwable;
 use SunDoge\Swoole\Http\Request;
-//use Illuminate\Pipeline\Pipeline;
+use SunDoge\Swoole\Http\Response;
+use SunDoge\Swoole\Routing\Pipeline;
+use SunDoge\Swoole\Routing\Closure as RoutingClosure;
+use SunDoge\Swoole\Routing\Controller;
+
 use FastRoute\Dispatcher;
 
-use SunDoge\Swoole\Routing\Closure as RoutingClosure;
-//use Illuminate\Http\Response;
-use SunDoge\Swoole\Http\Response;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 
-//use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
-//use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use SunDoge\Swoole\Http\RequestFactory;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use SunDoge\Swoole\Exceptions\HttpResponseException;
 
 trait RoutesRequests
 {
@@ -401,7 +403,7 @@ trait RoutesRequests
 ////        dd($res);
 ////        return call_user_func_array($callback, [$response, $content]);
 //        $response->end($content);
-        (new \SunDoge\Swoole\Http\SapiEmitter())->emitThrough($psrResponse, $response);
+        (new \SunDoge\Swoole\Http\SapiEmitter($response))->emitThrough($psrResponse);
 
         if (count($this->middleware) > 0) {
             $this->callTerminableMiddleware($response);
@@ -564,13 +566,11 @@ trait RoutesRequests
     {
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
-//                throw new NotFoundHttpException;
-                echo 'not found';
+                throw new NotFoundHttpException;
                 break;
 
             case Dispatcher::METHOD_NOT_ALLOWED:
-//                throw new MethodNotAllowedHttpException($routeInfo[1]);
-                print_r($routeInfo[1]);
+                throw new MethodNotAllowedHttpException($routeInfo[1]);
                 break;
 
             case Dispatcher::FOUND:
@@ -656,7 +656,7 @@ trait RoutesRequests
             throw new NotFoundHttpException;
         }
 
-        if ($instance instanceof LumenController) {
+        if ($instance instanceof Controller) {
             return $this->callLumenController($instance, $method, $routeInfo);
         } else {
             return $this->callControllerCallable(
@@ -863,273 +863,4 @@ trait RoutesRequests
         return $this->bound('middleware.disable') && $this->make('middleware.disable') === true;
     }
 
-//    protected $routes = [];
-//
-//    protected $namedRoutes = [];
-//
-//    protected $middleware = [];
-//
-//    protected $routeMiddleware = [];
-//
-//    protected $groupAttributes;
-//
-//    protected $currentRoute;
-//
-//    protected $dispatcher;
-//
-//
-//    public function group(array $attributes, Closure $callback)
-//    {
-//        $parentGroupAttributes = $this->groupAttributes;
-//
-//        if (isset($attributes['middleware']) && is_string($attributes['middleware'])) {
-//            $attributes['middleware'] = explode('|', $attributes['middleware']);
-//        }
-//
-//        $this->groupAttributes = $attributes;
-//
-//        call_user_func($callback, $this);
-//
-//        $this->groupAttributes = $parentGroupAttributes;
-//    }
-//
-//    public function get($uri, $action)
-//    {
-//        $this->addRoute('GET', $uri, $action);
-//
-//        return $this;
-//    }
-//
-//    public function post($uri, $action)
-//    {
-//        $this->addRoute('POST', $uri, $action);
-//
-//        return $this;
-//    }
-//
-//    public function put($uri, $action)
-//    {
-//        $this->addRoute('PUT', $uri, $action);
-//
-//        return $this;
-//    }
-//
-//    public function patch($uri, $action)
-//    {
-//        $this->addRoute('PATCH', $uri, $action);
-//
-//        return $this;
-//    }
-//
-//    public function delete($uri, $action)
-//    {
-//        $this->addRoute('DELETE', $uri, $action);
-//
-//        return $this;
-//    }
-//
-//    public function options($uri, $action)
-//    {
-//        $this->addRoute('OPTIONS', $uri, $action);
-//
-//        return $this;
-//    }
-//
-//    public function addRoute($method, $uri, $action)
-//    {
-//        $action = $this->parseAction($action);
-//
-//        if (isset($this->groupAttributes)) {
-//            if (isset($this->groupAttributes['prefix'])) {
-//                $uri = trim($this->groupAttributes['prefix'], '/') . '/' . trim($uri, '/');
-//            }
-//
-//            if (isset($this->groupAttributes['suffix'])) {
-//                $uri = trim($uri, '/') . rtrim($this->groupAttributes['suffix'], '/');
-//            }
-//
-//            $action = $this->mergeGroupAttributes($action);
-//        }
-//
-//        $uri = '/' . trim($uri, '/');
-//
-//        if (isset($action['as'])) {
-//            $this->namedRoutes[$action['as']] = $uri;
-//        }
-//
-//        if (is_array($method)) {
-//            foreach ($method as $verb) {
-//                $this->routes[$verb . $uri] = ['method' => $verb, 'uri' => $uri, 'action' => $action];
-//            }
-//        } else {
-//            $this->routes[$method . $uri] = ['method' => $method, 'uri' => $uri, 'action' => $action];
-//        }
-//    }
-//
-//    protected function parseAction($action)
-//    {
-//        if (is_string($action)) {
-//            return ['uses' => $action];
-//        } elseif (!is_array($action)) {
-//            return [$action];
-//        }
-//
-//        if (isset($action['middleware']) && is_string($action['middleware'])) {
-//            $action['middleware'] = explode('|', $action['middleware']);
-//        }
-//
-//        return $action;
-//    }
-//
-//    protected function mergeGroupAttributes(array $action)
-//    {
-//        return $this->mergeNamespaceGroup(
-//            $this->mergeMiddlewareGroup($action)
-//        );
-//    }
-//
-//    protected function mergeNamespaceGroup(array $action)
-//    {
-//        if (isset($this->groupAttributes['namespace']) && isset($action['uses'])) {
-//            $action['uses'] = $this->groupAttributes['namespace'] . '\\' . $action['uses'];
-//        }
-//
-//        return $action;
-//    }
-//
-//    protected function mergeMiddlewareGroup($action)
-//    {
-//        if (isset($this->groupAttributes['middleware'])) {
-//            if (isset($action['middleware'])) {
-//                $action['middleware'] = array_merge($this->groupAttributes['middleware'], $action['middleware']);
-//            } else {
-//                $action['middleware'] = $this->groupAttributes['middleware'];
-//            }
-//        }
-//
-//        return $action;
-//    }
-//
-//    public function dispatch($request = null)
-//    {
-//        list($method, $pathInfo) = $this->parseIncomingRequest($request);
-//
-//        return $this->sendThroughPipeline($this->middleware, function () use ($method, $pathInfo) {
-//            if (isset($this->routes[$method . $pathInfo])) {
-//                return $this->handleFoundRoute([true, $this->routes[$method . $pathInfo]['action'], []]);
-//            }
-//
-//            return $this->handleDispatcherResponse(
-//                $this->createDispatcher()->dispatch($method, $pathInfo)
-//            );
-//        });
-//    }
-//
-//    protected function parseIncomingRequest($request)
-//    {
-//        if ($request) {
-//            $this->instance(Request::class, $this->prepareRequest($request));
-//            $this->ranServiceBinders['registerRequestBindings'] = true;
-//
-//            return [$request->getMethod(), $request->getPathInfo()];
-//        } else {
-//            return [$this->getMethod(), $this->getPathInfo()];
-//        }
-//    }
-//
-//    protected function getMethod()
-//    {
-//        if (isset($_POST['_method'])) {
-//            return strtoupper($_POST['_method']);
-//        } else {
-//            return $_SERVER['REQUEST_METHOD'];
-//        }
-//    }
-//
-//    protected function getPathInfo()
-//    {
-//        $query = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
-//
-//        return '/' . trim(str_replace('?' . $query, '', $_SERVER['REQUEST_URI']));
-//    }
-//
-//    protected function sendThroughPipeline(array $middleware, Closure $then)
-//    {
-//        if (count($middleware) > 0 && !$this->shouldSkipMiddleware()){
-//            return (new Pipeline($this))
-//                ->send($this->make('request'))
-//                ->through($middleware)
-//                ->then($then);
-//        }
-//
-//        return $then();
-//    }
-//
-//    protected function handleFoundRoute($routeInfo)
-//    {
-//        $this->currentRoute = $routeInfo;
-//
-//        $this['request']->setRouteResolve(function () {
-//            return $this->currentRoute;
-//        });
-//
-//        $action = $routeInfo[1];
-//
-//        if (isset($action['middleware'])) {
-//            $middleware = $this->gatherMiddlewareClassNames($action['middleware']);
-//
-//            return $this->prepareResponse($this->sendThroughPipeline($middleware), function () {
-//                 return $this->callActionOnArrayBasedRoute($this['request']->route());
-//            });
-//        }
-//
-//        return $this->prepareResponse(
-//            $this->callActionOnArrayBasedRoute($routeInfo)
-//        );
-//    }
-//
-//    protected function callActionOnArrayBasedRoute($routeInfo)
-//    {
-//        $action = $routeInfo[1];
-//
-//        if (isset($action['uses'])) {
-//            return $this->prepareResponse($this->callControllerAction($routeInfo));
-//        }
-//
-//        foreach ($action as $value) {
-//            if ($value instanceof Closure) {
-//                $closure = $value->bindTo(new RoutingClosure);
-//                break;
-//            }
-//        }
-//
-////        try {
-////            return $this->prepareResponse($this->call($closure, $routeInfo[2]));
-////        } catch (HttpResponseException $e) {
-////            return $e->getResponse();
-////        }
-//    }
-//
-//    protected function callControllerAction($routeInfo)
-//    {
-//        $uses = $routeInfo[1]['uses'];
-//
-//        if (is_string($uses) && ! Str::contains($uses, '@')) {
-//            $uses .= '@__invoke';
-//        }
-//
-//        list($controller, $method) = explode('@', $uses);
-//
-//        if (! method_exists($instance = $this->make($controller), $method)) {
-//            throw new NotFoundHttpException;
-//        }
-//
-//        if ($instance instanceof LumenController) {
-//            return $this->callLumenController($instance, $method, $routeInfo);
-//        } else {
-//            return $this->callControllerCallable(
-//                [$instance, $method], $routeInfo[2]
-//            );
-//        }
-//    }
 }

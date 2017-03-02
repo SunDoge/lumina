@@ -17,8 +17,14 @@ class SapiEmitter extends BaseEmitter
 {
     use SapiEmitterTrait;
 
+    protected $emitter;
 
-    public function emitThrough(ResponseInterface $psrResponse, $res, $maxBufferLevel = null)
+    public function __construct($emitter = null)
+    {
+        $this->emitter = $emitter;
+    }
+
+    public function emitThrough(ResponseInterface $psrResponse, $maxBufferLevel = null)
     {
 //        if (headers_sent()) {
 //            throw new RuntimeException('Unable to emit response; headers already sent');
@@ -35,7 +41,7 @@ class SapiEmitter extends BaseEmitter
             $psrResponse->getStatusCode(),
             ($reasonPhrase ? ' ' . $reasonPhrase : '')
         ));
-        $res->header($http[0], $http[1]);
+//        $this->emitter->header($http[0], $http[1]);
 
         foreach ($psrResponse->getHeaders() as $header => $values) {
             $name = $this->filterHeader($header);
@@ -47,12 +53,32 @@ class SapiEmitter extends BaseEmitter
 //                    $value
 //                ), $first);
 //                $first = false;
-                $res->header($name, $value);
+                $this->emitter->header($name, $value);
             }
         }
 
 
         $this->flush($maxBufferLevel);
-        $res->end($psrResponse->getBody());
+        $this->emitter->end($psrResponse->getBody());
+    }
+
+    public function emit(ResponseInterface $response, $maxBufferLevel = null)
+    {
+        if (headers_sent()) {
+            throw new RuntimeException('Unable to emit response; headers already sent');
+        }
+
+        $response = $this->injectContentLength($response);
+
+        $this->emitStatusLine($response);
+        $this->emitHeaders($response);
+        $this->flush($maxBufferLevel);
+        $this->emitBody($response);
+
+    }
+
+    private function emitBody(ResponseInterface $response)
+    {
+        echo $response->getBody();
     }
 }
