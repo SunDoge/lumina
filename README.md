@@ -77,7 +77,7 @@ Percentage of the requests served within a certain time (ms)
  100%    162 (longest request)
 ```
 
-## Compare to nodejs
+## Compare to express
 
 2017/03/02 Macbook Pro 13 2015
 
@@ -202,7 +202,7 @@ Percentage of the requests served within a certain time (ms)
  100%     66 (longest request)
 ```
 
-### nodejs
+### express
 
 ```text
 ➜  ~ ab -n 15000 -c 20 http://127.0.0.1:8888/controller/
