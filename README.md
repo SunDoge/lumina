@@ -1,6 +1,12 @@
-# A Tiny PHP Framework
+<div class="danger">
+This framework is far from being completed.
+</dive>
 
-Learn Lumen and Laravel.
+# Lumina
+
+## A Tiny PHP Framework
+
+As elegant as `Laravel`, as fast as `express`.
 
 ## Goal
 
@@ -12,6 +18,7 @@ Understand how Lumen and Laravel work by imitating the code and finally build my
 - [x] Make `controller` work.
 - [x] Modify the `Request`.
 - [x] Modify the `Response`.
+- [ ] Abandon `cli mode`.
 - [ ] Handle exceptions under cli mode.
 - [ ] Write `Mysql` driver.
 - [ ] Write `Redis` driver and add in `hredis`.
