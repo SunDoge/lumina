@@ -1,6 +1,6 @@
-<div class="danger">
+<div class="alert alert-danger">
 This framework is far from being completed.
-</dive>
+</div>
 
 # Lumina
 
