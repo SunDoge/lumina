@@ -1,5 +1,5 @@
 {
-    "name": "sundoge/swoole",
+    "name": "sundoge/lumina",
     "license": "MIT",
     "authors": [
         {
@@ -11,7 +11,7 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "SunDoge\\Swoole\\": "src/"
+            "SunDoge\\Lumina\\": "src/"
         },
         "files": [
             "src/helpers.php"

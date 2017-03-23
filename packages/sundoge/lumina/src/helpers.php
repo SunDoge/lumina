@@ -16,7 +16,7 @@ if (! function_exists('app')) {
      *
      * @param  string  $make
      * @param  array   $parameters
-     * @return mixed|\SunDoge\Swoole\Application
+     * @return mixed|\SunDoge\Lumina\Application
      */
     function app($make = null, $parameters = [])
     {
@@ -39,7 +39,7 @@ if (! function_exists('response')) {
      */
     function response($content = '', $status = 200, array $headers = [])
     {
-        $factory = new SunDoge\Swoole\Http\ResponseFactory;
+        $factory = new SunDoge\Lumina\Http\ResponseFactory;
 
         if (func_num_args() === 0) {
             return $factory;

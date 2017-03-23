@@ -1,11 +1,11 @@
 <?php
 
-namespace SunDoge\Swoole\Exceptions;
+namespace SunDoge\Lumina\Exceptions;
 
 use Exception;
 //use Illuminate\Http\Response;
-use SunDoge\Swoole\Http\HtmlResponse;
-use SunDoge\Swoole\Http\Response;
+use SunDoge\Lumina\Http\HtmlResponse;
+use SunDoge\Lumina\Http\Response;
 //use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 //use Illuminate\Auth\Access\AuthorizationException;
@@ -40,14 +40,14 @@ class Handler implements ExceptionHandler
         }
 
         try {
-            $logger = app('Psr\Log\LoggerInterface');
+//            $logger = app('Psr\Log\LoggerInterface');
             // Composer fails to include helpers.php for no reason.
 //             $logger = Container::getInstance()->make('Psr\Log\LoggerInterface');
         } catch (Exception $ex) {
             throw $e; // throw the original exception
         }
 
-        $logger->error($e);
+//        $logger->error($e);
     }
 
     /**

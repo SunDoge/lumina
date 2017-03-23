@@ -6,13 +6,12 @@
  * Time: 下午7:14
  */
 
-namespace SunDoge\Swoole;
+namespace SunDoge\Lumina;
 
 use Monolog\Logger;
 use RuntimeException;
 use Illuminate\Container\Container;
-//use Illuminate\Http\Request;
-use SunDoge\Swoole\Http\Request;
+use SunDoge\Lumina\Http\Request;
 
 
 class Application extends Container
@@ -42,7 +41,7 @@ class Application extends Container
 
         $this->instance('path', $this->path());
 
-        $this->instance('SunDoge\Swoole\Application', $this);
+        $this->instance('SunDoge\Lumina\Application', $this);
 
         $this->registerContainerAliases();
     }
@@ -84,7 +83,7 @@ class Application extends Container
             'Illuminate\Contracts\Queue\Factory' => 'queue',
             'Illuminate\Contracts\Queue\Queue' => 'queue.connection',
 //            'request' => 'Illuminate\Http\Request',
-            'request' => 'SunDoge\Swoole\Http\Request',
+            'request' => 'SunDoge\Lumina\Http\Request',
 //            'Laravel\Lumen\Routing\UrlGenerator' => 'url',
             'Illuminate\Contracts\Validation\Factory' => 'validator',
             'Illuminate\Contracts\View\Factory' => 'view',
@@ -100,15 +99,15 @@ class Application extends Container
      */
     public function getNamespace()
     {
-        if (! is_null($this->namespace)) {
+        if (!is_null($this->namespace)) {
             return $this->namespace;
         }
 
         $composer = json_decode(file_get_contents(base_path('composer.json')), true);
 
-        foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path) {
-            foreach ((array) $path as $pathChoice) {
-                if (realpath(app()->path()) == realpath(base_path().'/'.$pathChoice)) {
+        foreach ((array)data_get($composer, 'autoload.psr-4') as $namespace => $path) {
+            foreach ((array)$path as $pathChoice) {
+                if (realpath(app()->path()) == realpath(base_path() . '/' . $pathChoice)) {
                     return $this->namespace = $namespace;
                 }
             }
@@ -120,22 +119,23 @@ class Application extends Container
     /**
      * Resolve the given type from the container.
      *
-     * @param  string  $abstract
+     * @param  string $abstract
      * @return mixed
      */
-//    public function make($abstract)
-//    {
-//        $abstract = $this->getAlias($abstract);
-//
-//        if (array_key_exists($abstract, $this->availableBindings) &&
-//            ! array_key_exists($this->availableBindings[$abstract], $this->ranServiceBinders)) {
-//            $this->{$method = $this->availableBindings[$abstract]}();
-//
-//            $this->ranServiceBinders[$method] = true;
-//        }
-//
-//        return parent::make($abstract);
-//    }
+    public function make($abstract)
+    {
+        $abstract = $this->getAlias($abstract);
+
+        if (array_key_exists($abstract, $this->availableBindings) &&
+            !array_key_exists($this->availableBindings[$abstract], $this->ranServiceBinders)
+        ) {
+            $this->{$method = $this->availableBindings[$abstract]}();
+
+            $this->ranServiceBinders[$method] = true;
+        }
+
+        return parent::make($abstract);
+    }
 
     public $availableBindings = [
         'auth' => 'registerAuthBindings',

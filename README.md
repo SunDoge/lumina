@@ -18,8 +18,8 @@ Understand how Lumen and Laravel work by imitating the code and finally build my
 - [x] Make `controller` work.
 - [x] Modify the `Request`.
 - [x] Modify the `Response`.
-- [ ] Abandon `cli mode`.
-- [ ] Handle exceptions under cli mode.
+- [x] Abandon `cgi mode`.
+- [x] Handle exceptions under cli mode.
 - [ ] Write `Mysql` driver.
 - [ ] Write `Redis` driver and add in `hredis`.
 

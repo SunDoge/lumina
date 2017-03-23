@@ -7,7 +7,7 @@
  * Time: 下午7:15
  */
 
-namespace SunDoge\Swoole\Http;
+namespace SunDoge\Lumina\Http;
 
 use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response as ZendResponse;

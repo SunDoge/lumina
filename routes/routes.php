@@ -7,7 +7,7 @@
  */
 
 $app->get('/', function () {
-    return 'swoole';
+    return 'lumina';
 });
 
 $app->get('/test', function () {

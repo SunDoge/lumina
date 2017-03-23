@@ -1,6 +1,6 @@
 <?php
 
-namespace SunDoge\Swoole\Routing;
+namespace SunDoge\Lumina\Routing;
 
 use Closure as BaseClosure;
 use Illuminate\Http\Request;

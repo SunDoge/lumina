@@ -6,7 +6,7 @@
  * Time: 下午8:12
  */
 
-namespace SunDoge\Swoole\Routing;
+namespace SunDoge\Lumina\Routing;
 
 
 class Controller

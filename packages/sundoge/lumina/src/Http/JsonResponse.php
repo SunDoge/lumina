@@ -6,7 +6,7 @@
  * Time: 下午11:31
  */
 
-namespace SunDoge\Swoole\Http;
+namespace SunDoge\Lumina\Http;
 
 use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response\JsonResponse as BaseResponse;

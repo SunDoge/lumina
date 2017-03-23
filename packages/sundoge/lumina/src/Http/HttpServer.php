@@ -6,7 +6,7 @@
  * Time: 下午11:21
  */
 
-namespace SunDoge\Swoole\Http;
+namespace SunDoge\Lumina\Http;
 
 
 class HttpServer

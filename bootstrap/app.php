@@ -8,7 +8,7 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$app = new SunDoge\Swoole\Application(
+$app = new SunDoge\Lumina\Application(
     realpath(__DIR__ . '/../')
 );
 

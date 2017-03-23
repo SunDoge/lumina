@@ -6,10 +6,10 @@
  * Time: 下午7:19
  */
 
-namespace SunDoge\Swoole\Exceptions;
+namespace SunDoge\Lumina\Exceptions;
 
 use RuntimeException;
-use SunDoge\Swoole\Http\Response;
+use SunDoge\Lumina\Http\Response;
 
 class HttpResponseException extends RuntimeException
 {

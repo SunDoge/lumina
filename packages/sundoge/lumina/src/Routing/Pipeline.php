@@ -1,6 +1,6 @@
 <?php
 
-namespace SunDoge\Swoole\Routing;
+namespace SunDoge\Lumina\Routing;
 
 use Throwable;
 use Exception;

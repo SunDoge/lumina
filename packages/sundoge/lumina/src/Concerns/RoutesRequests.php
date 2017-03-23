@@ -6,16 +6,16 @@
  * Time: 下午8:12
  */
 
-namespace SunDoge\Swoole\Concerns;
+namespace SunDoge\Lumina\Concerns;
 
 use Closure;
 use Exception;
 use Throwable;
-use SunDoge\Swoole\Http\Request;
-use SunDoge\Swoole\Http\Response;
-use SunDoge\Swoole\Routing\Pipeline;
-use SunDoge\Swoole\Routing\Closure as RoutingClosure;
-use SunDoge\Swoole\Routing\Controller;
+use SunDoge\Lumina\Http\Request;
+use SunDoge\Lumina\Http\Response;
+use SunDoge\Lumina\Routing\Pipeline;
+use SunDoge\Lumina\Routing\Closure as RoutingClosure;
+use SunDoge\Lumina\Routing\Controller;
 
 use FastRoute\Dispatcher;
 
@@ -24,10 +24,10 @@ use Illuminate\Support\Arr;
 
 
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
-use SunDoge\Swoole\Http\RequestFactory;
+use SunDoge\Lumina\Http\RequestFactory;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use SunDoge\Swoole\Exceptions\HttpResponseException;
+use SunDoge\Lumina\Exceptions\HttpResponseException;
 
 trait RoutesRequests
 {
@@ -366,7 +366,7 @@ trait RoutesRequests
         if ($response instanceof PsrResponseInterface) {
 //            $emmiter = new SapiEmitter();
 //            $emmiter->emit($response);
-            (new \SunDoge\Swoole\Http\SapiEmitter())->emit($response);
+            (new \SunDoge\Lumina\Http\SapiEmitter())->emit($response);
         } else {
             echo (string)$response;
 //            print_r($response);
@@ -391,7 +391,8 @@ trait RoutesRequests
 //        $res = $this->handleDispatcherResponse(
 //            $this->createDispatcher()->dispatch($method, $uri)
 //        );
-        $psrResponse = $this->_dispatch($request);
+        ob_start();
+        $_response = $this->_dispatch($request);
 
 
 //        $content = $res->getContent();
@@ -403,7 +404,17 @@ trait RoutesRequests
 ////        dd($res);
 ////        return call_user_func_array($callback, [$response, $content]);
 //        $response->end($content);
-        (new \SunDoge\Swoole\Http\SapiEmitter($response))->emitThrough($psrResponse);
+
+        if ($_response instanceof PsrResponseInterface) {
+            (new \SunDoge\Lumina\Http\SapiEmitter($response))->emitThrough($_response);
+        } else {
+            echo $_response;
+        }
+
+
+        $content = ob_get_contents();
+        $response->end($content);
+        ob_clean();
 
         if (count($this->middleware) > 0) {
             $this->callTerminableMiddleware($response);
@@ -525,7 +536,7 @@ trait RoutesRequests
 //        if ($request) {
         $this->instance(Request::class, RequestFactory::from($request));
 
-        return [$this->_getMethod($request), $this->_getPathInfo($request)];
+        return [$this->getMethod($request), $this->getPathInfo($request)];
 //        } else {
 //            return [$this->getMethod(), $this->getQueryParams()];
 //        }
@@ -805,16 +816,16 @@ trait RoutesRequests
      *
      * @return string
      */
-    protected function getMethod()
-    {
-        if (isset($_POST['_method'])) {
-            return strtoupper($_POST['_method']);
-        } else {
-            return $_SERVER['REQUEST_METHOD'];
-        }
-    }
+//    protected function getMethod()
+//    {
+//        if (isset($_POST['_method'])) {
+//            return strtoupper($_POST['_method']);
+//        } else {
+//            return $_SERVER['REQUEST_METHOD'];
+//        }
+//    }
 
-    protected function _getMethod($request)
+    protected function getMethod($request)
     {
         if (isset($request->post['_method'])) {
             return strtoupper($request->post['_method']);
@@ -828,14 +839,14 @@ trait RoutesRequests
      *
      * @return string
      */
-    protected function getPathInfo()
-    {
-        $query = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
+//    protected function getPathInfo()
+//    {
+//        $query = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
+//
+//        return '/' . trim(str_replace('?' . $query, '', $_SERVER['REQUEST_URI']), '/');
+//    }
 
-        return '/' . trim(str_replace('?' . $query, '', $_SERVER['REQUEST_URI']), '/');
-    }
-
-    protected function _getPathInfo($request)
+    protected function getPathInfo($request)
     {
         $query = isset($request->server['query_string']) ? $request->server['query_string'] : '';
 

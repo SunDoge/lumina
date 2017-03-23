@@ -6,7 +6,7 @@
  * Date: 2017/2/16
  * Time: 上午10:37
  */
-namespace SunDoge\Swoole\Routing;
+namespace SunDoge\Lumina\Routing;
 
 class Closure
 {

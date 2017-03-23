@@ -6,7 +6,7 @@
  * Time: 下午11:39
  */
 
-namespace SunDoge\Swoole\Http;
+namespace SunDoge\Lumina\Http;
 
 use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response\SapiEmitter as BaseEmitter;
@@ -59,7 +59,8 @@ class SapiEmitter extends BaseEmitter
 
 
         $this->flush($maxBufferLevel);
-        $this->emitter->end($psrResponse->getBody());
+//        $this->emitter->end($psrResponse->getBody());
+        $this->emitBody($psrResponse);
     }
 
     public function emit(ResponseInterface $response, $maxBufferLevel = null)

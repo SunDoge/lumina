@@ -6,7 +6,7 @@
  * Time: 下午11:18
  */
 
-namespace SunDoge\Swoole\Http;
+namespace SunDoge\Lumina\Http;
 
 use Illuminate\Contracts\Support\Arrayable;
 

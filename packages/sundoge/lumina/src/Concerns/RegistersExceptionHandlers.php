@@ -1,12 +1,12 @@
 <?php
 
-namespace SunDoge\Swoole\Concerns;
+namespace SunDoge\Lumina\Concerns;
 
 use Error;
 use Exception;
 use ErrorException;
 //use Symfony\Component\Console\Output\ConsoleOutput;
-use SunDoge\Swoole\Http\SapiEmitter;
+use SunDoge\Lumina\Http\SapiEmitter;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -141,7 +141,7 @@ trait RegistersExceptionHandlers
         if ($this->bound('Illuminate\Contracts\Debug\ExceptionHandler')) {
             return $this->make('Illuminate\Contracts\Debug\ExceptionHandler');
         } else {
-            return $this->make('SunDoge\Swoole\Exceptions\Handler');
+            return $this->make('SunDoge\Lumina\Exceptions\Handler');
         }
     }
 }
